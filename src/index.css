@@ -1,0 +1,86 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary: #FAF8F5;
+  --bg-secondary: #EFECE6;
+  --surface-card: #FFFFFF;
+  --brand-olive: #2F3E2E;
+  --brand-sage: #7C8C76;
+  --accent-gold: #C5A880;
+  --accent-terracotta: #B87D64;
+  --text-primary: #1E241E;
+  --text-muted: #5C645A;
+  --border-subtle: #E2DEC9;
+}
+
+@layer base {
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .font-editorial {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+  }
+}
+
+@layer components {
+  .eclat-container {
+    max-width: 1280px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  @media (min-width: 1024px) {
+    .eclat-container {
+      padding-left: 64px;
+      padding-right: 64px;
+    }
+  }
+
+  .eclat-section {
+    padding-top: 56px;
+    padding-bottom: 56px;
+  }
+
+  @media (min-width: 1024px) {
+    .eclat-section {
+      padding-top: 96px;
+      padding-bottom: 96px;
+    }
+  }
+
+  .meta-tag {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+}
+
+/* Custom subtle scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--brand-sage);
+}
+
