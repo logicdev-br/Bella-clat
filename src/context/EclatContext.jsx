@@ -7,7 +7,7 @@ import {
   INITIAL_SPECIALIST_NOTES,
   INITIAL_HISTORY,
 } from '../data/mockData';
-import { sendTransactionalEmail } from '../services/apiServices';
+import { sendTransactionalEmail, syncToSupabase } from '../services/apiServices';
 
 const EclatContext = createContext(null);
 
@@ -585,6 +585,7 @@ export function EclatProvider({ children }) {
   const saveNewSkinPlan = (answers) => {
     const generated = buildSkinPlanFromAnswers(answers);
     setSkinPlan(generated);
+    syncToSupabase('SKIN_PLAN', generated);
     showToast(
       'Planejamento Facial salvo no Meu Espaço Éclat',
       'Seu cronograma de 6 meses e rotina diária foram sincronizados.'

@@ -317,6 +317,77 @@ export async function fetchAddressByCep(rawCep) {
   }
 }
 
-export async function sendTransactionalEmail() {
+export async function sendTransactionalEmail({ subject, details }) {
+  // Se o Supabase estiver configurado no .env / Vercel, salva automaticamente no banco de dados na nuvem!
+  await syncToSupabase(subject, details);
   return { sent: true };
+}
+
+/**
+ * INTEGRAÇÃO AUTOMÁTICA COM SUPABASE REST API
+ * Salva Agendamentos, Pedidos da Boutique, Planos Faciais e Newsletter no banco PostgreSQL do Supabase.
+ */
+export async function syncToSupabase(eventType = '', payload = {}) {
+  const url = (API_KEYS.SUPABASE_URL || '').trim().replace(/\/$/, '');
+  const key = (API_KEYS.SUPABASE_ANON_KEY || '').trim();
+
+  if (!url || !key) return { synced: false };
+
+  let table = 'appointments';
+  let rowData = payload;
+
+  if (eventType.includes('Reserva Confirmada') && payload.protocolo) {
+    table = 'appointments';
+    rowData = {
+      id: `apt-${Date.now()}`,
+      protocol_id: payload.protocolId || 'p1',
+      protocol_name: payload.protocolo,
+      date_label: payload.data,
+      time_slot: payload.horario,
+      modality: payload.modalidade,
+      total_price: parseFloat(String(payload.valor_total || '0').replace(/\D/g, '')) || 380,
+      status: 'Confirmado',
+    };
+  } else if (eventType.includes('Pedido na Boutique')) {
+    table = 'boutique_orders';
+    rowData = {
+      items: payload,
+      delivery_option: payload.modalidade || 'Flagship',
+      total_amount: parseFloat(String(payload.total || '0').replace(/\D/g, '')) || 0,
+    };
+  } else if (eventType.includes('Lettre Botanique') && payload.email_inscrito) {
+    table = 'newsletter_leads';
+    rowData = {
+      email: payload.email_inscrito,
+    };
+  } else if (eventType === 'SKIN_PLAN') {
+    table = 'skin_plans';
+    rowData = {
+      biotipo: payload?.answers?.biotipo || '',
+      objetivo: payload?.answers?.objetivo || '',
+      restricoes: payload?.answers?.restricoes || '',
+      estilo_rotina: payload?.answers?.estiloRotina || '',
+      frequencia: payload?.answers?.frequencia || '',
+      profile_title: payload?.profileTitle || '',
+      cycle_day: payload?.cycleDay || 24,
+      clinic_schedule: payload?.clinicSchedule || [],
+    };
+  }
+
+  try {
+    const res = await fetch(`${url}/rest/v1/${table}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+        Prefer: 'return=minimal',
+      },
+      body: JSON.stringify(rowData),
+    });
+    return { synced: res.ok };
+  } catch (err) {
+    console.error('Erro ao sincronizar com Supabase:', err);
+    return { synced: false };
+  }
 }
