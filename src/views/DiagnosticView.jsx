@@ -28,6 +28,9 @@ export default function DiagnosticView() {
     addFullRoutineToBag,
     navigateTo,
     isClubMember,
+    chezVousCredits,
+    appointments,
+    bagItems,
   } = useEclat();
 
   // 'welcome' | 'quiz' | 'result'
@@ -50,9 +53,14 @@ export default function DiagnosticView() {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiQuestion, setAiQuestion] = useState('');
   const [lastAskedQuestion, setLastAskedQuestion] = useState('');
+  const [diagnosticChatHistory, setDiagnosticChatHistory] = useState([]);
 
   const handleAskGemini = async (customQ = '') => {
     const qText = customQ.trim();
+    const nextHistory = qText
+      ? [...diagnosticChatHistory, { role: 'user', text: qText }]
+      : diagnosticChatHistory;
+
     if (qText) {
       setLastAskedQuestion(qText);
       setAiQuestion('');
@@ -63,7 +71,16 @@ export default function DiagnosticView() {
     const res = await askBotanicalAI({
       skinPlan,
       userQuestion: qText,
+      chatHistory: nextHistory,
+      isClubMember,
+      chezVousCredits,
+      appointments,
+      bagItems,
     });
+    setDiagnosticChatHistory([
+      ...nextHistory,
+      { role: 'assistant', text: res.text },
+    ]);
     setAiResponse(res);
     setAiLoading(false);
   };

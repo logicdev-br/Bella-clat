@@ -4,14 +4,20 @@ import { useEclat } from '../context/EclatContext';
 import { askBotanicalAI } from '../services/apiServices';
 
 export default function BotanicalAIChatWidget() {
-  const { skinPlan } = useEclat();
+  const {
+    skinPlan,
+    isClubMember,
+    chezVousCredits,
+    appointments,
+    bagItems,
+  } = useEclat();
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      text: 'Bonjour! Sou a Dra. Camille Laurent (IA), Facialista Sênior da Maison Belle Éclat. Como posso ajudar sua pele hoje?',
+      text: 'Bonjour! Sou a Dra. Camille Laurent (IA), Facialista Sênior da Maison Belle Éclat. Conheço todo o nosso catálogo, ativos botânicos e o seu plano facial. Sobre o que gostaria de conversar hoje?',
     },
   ]);
 
@@ -28,13 +34,19 @@ export default function BotanicalAIChatWidget() {
     const text = input.trim();
     if (!text || loading) return;
 
+    const updatedHistory = [...messages, { role: 'user', text }];
     setInput('');
-    setMessages((prev) => [...prev, { role: 'user', text }]);
+    setMessages(updatedHistory);
     setLoading(true);
 
     const res = await askBotanicalAI({
       skinPlan,
       userQuestion: text,
+      chatHistory: updatedHistory,
+      isClubMember,
+      chezVousCredits,
+      appointments,
+      bagItems,
     });
 
     setMessages((prev) => [
@@ -143,3 +155,4 @@ export default function BotanicalAIChatWidget() {
     </div>
   );
 }
+
