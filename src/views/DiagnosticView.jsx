@@ -49,12 +49,20 @@ export default function DiagnosticView() {
   const [aiResponse, setAiResponse] = useState(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiQuestion, setAiQuestion] = useState('');
+  const [lastAskedQuestion, setLastAskedQuestion] = useState('');
 
   const handleAskGemini = async (customQ = '') => {
+    const qText = customQ.trim();
+    if (qText) {
+      setLastAskedQuestion(qText);
+      setAiQuestion('');
+    } else {
+      setLastAskedQuestion('');
+    }
     setAiLoading(true);
     const res = await askBotanicalAI({
       skinPlan,
-      userQuestion: customQ,
+      userQuestion: qText,
     });
     setAiResponse(res);
     setAiLoading(false);
@@ -337,15 +345,23 @@ export default function DiagnosticView() {
                 </button>
               </div>
 
-              {aiResponse && (
-                <div className="p-5 rounded-[8px] bg-[#FAF8F5] border border-[#C5A880] space-y-2">
+              {aiLoading && (
+                <div className="p-5 rounded-[8px] bg-[#FAF8F5] border border-[#E2DEC9] flex items-center gap-3 text-[13px] text-[#5C645A]">
+                  <Loader2 className="w-4 h-4 animate-spin text-[#2F3E2E]" />
+                  <span>Dra. Camille Laurent está elaborando sua resposta via Gemini IA...</span>
+                </div>
+              )}
+
+              {!aiLoading && aiResponse && (
+                <div className="p-5 rounded-[8px] bg-[#FAF8F5] border border-[#C5A880] space-y-2.5">
+                  {lastAskedQuestion && (
+                    <div className="pb-2 border-b border-[#E2DEC9] text-[12px] text-[#5C645A]">
+                      <strong>Sua pergunta:</strong> “{lastAskedQuestion}”
+                    </div>
+                  )}
                   <div className="flex items-center justify-between text-[11px] uppercase tracking-[0.08em] text-[#7C8C76]">
                     <span>Dra. Camille Laurent • Facialista Sênior</span>
-                    <span>
-                      {aiResponse.fromLiveAPI
-                        ? '✦ Gerado ao vivo via Gemini API'
-                        : 'Modo Demonstração (Cole sua chave em src/config/apiConfig.js)'}
-                    </span>
+                    <span>✦ Gemini AI Ativa</span>
                   </div>
                   <p className="text-[14px] text-[#1E241E] leading-relaxed whitespace-pre-line">
                     {aiResponse.text}

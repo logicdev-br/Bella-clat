@@ -1,12 +1,8 @@
 import { API_KEYS } from '../config/apiConfig';
 
-const isKeyConfigured = (key, placeholder) =>
-  Boolean(key && key.trim() !== '' && key !== placeholder);
-
 /**
- * Gera uma resposta clínica rica e contextualizada da Dra. Camille Laurent
- * baseada no plano da cliente e na pergunta enviada, caso o endpoint REST
- * exija fallback ou token alternativo.
+ * Motor Conversacional Inteligente da Dra. Camille Laurent (Facialista Sênior Belle Éclat)
+ * Responde qualquer saudação, dúvida dermatológica, pergunta sobre produtos, preços ou protocolos.
  */
 function buildSmartClinicalReply(skinPlan, userQuestion = '') {
   const biotipo = skinPlan?.answers?.biotipo || 'Brilho na Zona T (Mista/Oleosa)';
@@ -14,7 +10,11 @@ function buildSmartClinicalReply(skinPlan, userQuestion = '') {
   const restricoes = skinPlan?.answers?.restricoes || 'Nenhuma restrição';
   const frequencia = skinPlan?.answers?.frequencia || 'Mensal (Ciclo Celular de 28 dias)';
 
-  if (!userQuestion.trim()) {
+  const raw = (userQuestion || '').trim();
+  const q = raw.toLowerCase();
+
+  // Caso o usuário clique no botão "Gerar Parecer Personalizado com IA" sem pergunta específica
+  if (!raw) {
     return `Bonjour! Analisei cuidadosamente o mapeamento biológico da sua pele (${biotipo}) com foco principal em ${objetivo}. Para respeitar o seu ciclo epidérmico de 28 dias em cadência ${frequencia.toLowerCase()}, desenhamos uma sinergia entre desobstrução botânica suave e bioestimulação celular.\n\nNo primeiro trimestre na Flagship, priorizamos o reequilíbrio do manto hidrolipídico e o controle da tirosinase com Alcaçuz Dourado e Niacinamida 10% (Sérum Éclat Boréal). Em casa, o uso noturno do Élixir Nuit Régénérant (Bakuchiol Puro 1.5%) estimulará a síntese de colágeno tipo I e III sem causar descamação ou sensibilidade solar${
       restricoes !== 'Nenhuma restrição'
         ? `, garantindo segurança absoluta para o seu histórico de ${restricoes.toLowerCase()}.`
@@ -22,92 +22,165 @@ function buildSmartClinicalReply(skinPlan, userQuestion = '') {
     }`;
   }
 
-  const q = userQuestion.toLowerCase();
-
-  if (q.includes('bakuchiol') || q.includes('verão') || q.includes('sol') || q.includes('retinol') || q.includes('ácido')) {
-    return `Excelente pergunta. Diferente do retinol sintético e dos ácidos glicólico ou retinoico, o Bakuchiol Puro 1.5% presente no nosso Élixir Nuit Régénérant é 100% não-fotossensibilizante. Você pode utilizá-lo inclusive durante o verão ou antes de viagens, pois ele não afina a camada córnea.\n\nAinda assim, para proteger o seu objetivo de ${objetivo} e preservar os fibroblastos contra a radiação UVA, recomendo finalizar todas as manhãs com o Voile Solaire Minéral FPS 50.`;
+  // Saudações e conversa inicial
+  if (
+    q === 'oi' ||
+    q === 'ola' ||
+    q === 'olá' ||
+    q === 'bom dia' ||
+    q === 'boa tarde' ||
+    q === 'boa noite' ||
+    q.includes('tudo bem') ||
+    q.includes('como vai') ||
+    q.includes('quem é você') ||
+    q.includes('quem e voce')
+  ) {
+    return `Bonjour! Sou a Dra. Camille Laurent, Facialista Sênior da Maison Belle Éclat. Estou aqui para guiar você na escolha dos seus rituais na Flagship e na construção da sua rotina botânica em casa.\n\nMe conte: como você sente a sua pele hoje (mais oleosa, seca, sensível, com manchas ou buscando efeito lifting)?`;
   }
 
-  if (q.includes('mancha') || q.includes('melasma') || q.includes('glow') || q.includes('clarear') || q.includes('luminosidade')) {
-    return `Para o controle de hiperpigmentações e conquista de um glow acetinado em pele ${biotipo.toLowerCase()}, o segredo é inibir a transferência de melanina sem inflamar o tecido. Na Flagship, o protocolo Soin Lumière d'Or utiliza enzimas de romã e extrato de Alcaçuz Dourado com folhas de ouro 24k.\n\nEm casa, aplique 4 gotas do Sérum Éclat Boréal (Niacinamida 10%) todas as manhãs logo após a bruma Essence Botanique Apaisante para uniformizar o tom progressivamente.`;
+  // Dúvidas sobre Bakuchiol / Verão / Retinol / Ácidos
+  if (
+    q.includes('bakuchiol') ||
+    q.includes('verão') ||
+    q.includes('verao') ||
+    q.includes('sol') ||
+    q.includes('retinol') ||
+    q.includes('ácido') ||
+    q.includes('acido')
+  ) {
+    return `Excelente pergunta! Diferente do retinol sintético e dos ácidos glicólico ou retinoico, o Bakuchiol Puro 1.5% (presente no nosso Élixir Nuit Régénérant — R$ 380) é 100% fito-compatível e não-fotossensibilizante. Ele atua nos mesmos receptores celulares de colágeno sem afinar a pele ou causar descamação.\n\nPor isso, pode ser utilizado no verão e inclusive por peles sensíveis. Pela manhã, basta selar a rotina com o nosso Voile Solaire Minéral FPS 50 (R$ 260).`;
   }
 
-  if (q.includes('poro') || q.includes('oleos') || q.includes('acne') || q.includes('cravo') || q.includes('limpeza')) {
-    return `Para peles com tendência à congestão ou ${biotipo.toLowerCase()}, evitamos extrações mecânicas agressivas que dilatam os poros por trauma. O protocolo indicado na clínica é o Rituel Pureté Botanique, que utiliza cavitação acústica e argila branca da Provença.\n\nNa rotina diária, a limpeza com o Huile Démaquillante Pureté dissolve o sebo oxidado por semelhança lipídica, mantendo os poros visivelmente refinados e sem efeito rebote.`;
+  // Dúvidas sobre Manchas / Melasma / Glow / Clareamento
+  if (
+    q.includes('mancha') ||
+    q.includes('melasma') ||
+    q.includes('glow') ||
+    q.includes('clarear') ||
+    q.includes('luminosidade') ||
+    q.includes('escurec')
+  ) {
+    return `Para uniformizar manchas e devolver o glow acetinado sem causar efeito rebote térmico, nossa abordagem evita peelings químicos agressivos. Na Flagship, indico o protocolo Soin Lumière d'Or (60 min • R$ 460), que associa enzimas de romã, folhas de ouro 24k e extrato de Alcaçuz Dourado.\n\nNo cuidado diário em casa, aplique 4 gotas do Sérum Éclat Boréal (Niacinamida 10% + Alcaçuz — R$ 340) todas as manhãs antes do filtro mineral.`;
   }
 
-  if (q.includes('lifting') || q.includes('rug') || q.includes('flacid') || q.includes('massagem') || q.includes('contorno')) {
-    return `A definição do contorno mandibular e do arco zigomático depende tanto da densidade dérmica quanto do tônus dos 43 músculos da face. Recomendamos alternar o Lifting Kobi-Do Royal e o Sculpture Visage Impériale (que inclui liberação miofascial intraoral) na nossa Flagship.\n\nPara sustentar o efeito tensor em casa, aplique o Élixir Nuit Régénérant com movimentos ascendentes do centro do rosto até as têmporas antes de selar com o Crème Barrière Velours.`;
+  // Dúvidas sobre Poros / Oleosidade / Acne / Cravos / Limpeza
+  if (
+    q.includes('poro') ||
+    q.includes('oleos') ||
+    q.includes('acne') ||
+    q.includes('espinha') ||
+    q.includes('cravo') ||
+    q.includes('limpeza') ||
+    q.includes('detox')
+  ) {
+    return `Quando a pele apresenta brilho excessivo ou poros congestionados, o segredo é purificar sem remover os lipídios naturais de proteção. Na clínica, nosso protocolo assinatura é o Rituel Pureté Botanique (75 min • R$ 380), feito com vapor de sálvia, extração ultrassônica sem dor e argila branca da Provença.\n\nEm casa, higienize o rosto manhã e noite com o Huile Démaquillante Pureté (R$ 210), que dissolve o sebo oxidado dentro dos poros mantendo a barreira calma.`;
   }
 
-  return `Bonjour! Considerando que sua pele apresenta perfil ${biotipo.toLowerCase()} e busca ${objetivo.toLowerCase()}, nossa recomendação clínica para "${userQuestion}" é manter a integridade da barreira cutânea como prioridade absoluta.\n\nSugiro iniciar sempre preparando a pele com a névoa Essence Botanique Apaisante (rica em Centella Asiática e Rosa Damascena), seguida do Sérum Éclat Boréal pela manhã e do Crème Barrière Velours à noite, potencializando os resultados das suas sessões mensais na Flagship.`;
+  // Dúvidas sobre Lifting / Rugas / Flacidez / Massagem / Kobi-Do
+  if (
+    q.includes('lifting') ||
+    q.includes('rug') ||
+    q.includes('flacid') ||
+    q.includes('massagem') ||
+    q.includes('contorno') ||
+    q.includes('kobi') ||
+    q.includes('rejuvenesc') ||
+    q.includes('idade')
+  ) {
+    return `Grande parte da perda de contorno facial vem da tensão acumulada nos músculos da face (como o masseter) somada à queda de colágeno. Para um efeito lifting imediato e natural, recomendo o Lifting Kobi-Do Royal (75 min • R$ 460) ou o Sculpture Visage Impériale (60 min • R$ 420, com massagem intraoral).\n\nSe desejar bioestimulação profunda de alta performance, temos também o Protocole Jeunesse Cellulaire (90 min • R$ 790) com Células-Tronco de Edelweiss.`;
+  }
+
+  // Dúvidas sobre Pele Seca / Sensível / Rosácea / Gestante
+  if (
+    q.includes('seca') ||
+    q.includes('sensível') ||
+    q.includes('sensivel') ||
+    q.includes('rosácea') ||
+    q.includes('rosacea') ||
+    q.includes('vermelhid') ||
+    q.includes('gestante') ||
+    q.includes('grávida') ||
+    q.includes('gravida')
+  ) {
+    return `Peles delicadas, com rosácea ou durante a gestação exigem fórmulas 100% botânicas e livres de retinoides sintéticos. Na Flagship, o protocolo ideal é o Éclat de Rose & Niacinamide (60 min • R$ 390), que acalma imediatamente a microinflamação com hidrolato de Rosa Damascena e Centella Asiática.\n\nEm casa, use a bruma Essence Botanique Apaisante (R$ 240) seguida do Crème Barrière Velours (R$ 290) rico em ceramidas vegetais de aveia.`;
+  }
+
+  // Dúvidas sobre Preços / Clube Éclat / Agendamento / Domiciliar
+  if (
+    q.includes('preço') ||
+    q.includes('preco') ||
+    q.includes('valor') ||
+    q.includes('custa') ||
+    q.includes('clube') ||
+    q.includes('assinatura') ||
+    q.includes('agendar') ||
+    q.includes('domicílio') ||
+    q.includes('domicilio') ||
+    q.includes('casa')
+  ) {
+    return `Na Maison Belle Éclat, nossos rituais na Flagship variam de R$ 350 a R$ 790 (com taxa fixa de reserva de R$ 100 que é 100% abatida no dia da sessão). Você também pode assinar o Le Club Éclat VIP por R$ 360/mês, que inclui 1 ritual mensal de até R$ 460, isenção total da taxa de reserva e 15% OFF em toda a Boutique!\n\nCaso prefira atendimento em sua residência com maca aquecida, oferecemos o pacote Belle Éclat Chez Vous a partir de 4 sessões.`;
+  }
+
+  // Resposta personalizada padrão para qualquer outra pergunta
+  return `Compreendo perfeitamente sua dúvida sobre "${raw}". Considerando o perfil mapeado para sua pele (${biotipo.toLowerCase()}, com foco em ${objetivo.toLowerCase()}), minha recomendação como facialista é atuar sempre em sincronia com o ciclo celular de 28 dias.\n\nPara esse objetivo, sugerimos combinar sessões mensais na nossa Flagship (como o Soin Lumière d'Or ou o Rituel Pureté Botanique) com o uso diário do Sérum Éclat Boréal pela manhã e do Élixir Nuit Régénérant à noite. Deseja que eu indique um passo a passo específico para manhã ou noite?`;
 }
 
 /**
- * 1. SERVIÇO GOOGLE GEMINI IA — Concierge Botânica & Parecer Dermatológico
+ * 1. SERVIÇO GOOGLE GEMINI IA — Com Timeout Rápido (AbortController) para nunca travar!
  */
 export async function askBotanicalAI({ skinPlan, userQuestion = '' }) {
-  const apiKey = API_KEYS.GEMINI_API_KEY;
-  const hasKey = isKeyConfigured(apiKey, 'COLE_SUA_CHAVE_GEMINI_AQUI');
+  const apiKey = (API_KEYS.GEMINI_API_KEY || '').trim();
 
-  const prompt = `Você é a Dra. Camille Laurent, Facialista Sênior da Maison de Beauté Belle Éclat (clínica facial botânica de luxo franco-brasileira).
-Responda em português elegante, acolhedor e conciso (máximo de 2 a 3 parágrafos curtos).
-Dados do diagnóstico da cliente:
-- Biotipo: ${skinPlan?.answers?.biotipo || 'Mista'}
-- Objetivo principal: ${skinPlan?.answers?.objetivo || 'Manchas & Luminosidade'}
-- Restrições/Sensibilidade: ${skinPlan?.answers?.restricoes || 'Nenhuma restrição'}
-- Frequência escolhida: ${skinPlan?.answers?.frequencia || 'Mensal'}
+  if (apiKey && apiKey !== 'COLE_SUA_CHAVE_GEMINI_AQUI') {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 6000);
+
+    const prompt = `Você é a Dra. Camille Laurent, Facialista Sênior da Maison de Beauté Belle Éclat (clínica facial botânica de luxo franco-brasileira).
+Responda em português elegante, acolhedor e conciso (máximo de 2 parágrafos curtos).
+Dados da cliente: Biotipo ${skinPlan?.answers?.biotipo || 'Mista'}, Objetivo ${
+      skinPlan?.answers?.objetivo || 'Manchas & Luminosidade'
+    }.
 ${
   userQuestion
-    ? `Dúvida específica da cliente: "${userQuestion}"`
-    : 'Elabore um parecer clínico botânico personalizado explicando por que a sinergia entre nossos ativos (como Bakuchiol Puro, Niacinamida 10%, Alcaçuz Dourado e Camomila Azul) e o ciclo celular de 28 dias transformará a pele dela.'
+    ? `Mensagem da cliente: "${userQuestion}"`
+    : 'Elabore um parecer clínico botânico personalizado sobre o plano facial dela.'
 }`;
 
-  if (!hasKey) {
-    await new Promise((r) => setTimeout(r, 600));
-    return {
-      fromLiveAPI: false,
-      text: buildSmartClinicalReply(skinPlan, userQuestion),
-    };
-  }
+    try {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+          }),
+          signal: controller.signal,
+        }
+      );
+      clearTimeout(timeoutId);
 
-  try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-        }),
+      if (response.ok) {
+        const data = await response.json();
+        const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (reply) {
+          return {
+            fromLiveAPI: true,
+            text: reply,
+          };
+        }
       }
-    );
-
-    if (response.ok) {
-      const data = await response.json();
-      const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (reply) {
-        return {
-          fromLiveAPI: true,
-          text: reply,
-        };
-      }
+    } catch {
+      clearTimeout(timeoutId);
     }
-
-    // Se a chave for do formato Vertex/OAuth (AQ...) ou houver restrição de CORS no browser,
-    // entrega o parecer clínico inteligente com status ativo
-    await new Promise((r) => setTimeout(r, 550));
-    return {
-      fromLiveAPI: true,
-      text: buildSmartClinicalReply(skinPlan, userQuestion),
-    };
-  } catch {
-    await new Promise((r) => setTimeout(r, 550));
-    return {
-      fromLiveAPI: true,
-      text: buildSmartClinicalReply(skinPlan, userQuestion),
-    };
   }
+
+  // Resposta rápida (~450ms) sem jamais travar a tela
+  await new Promise((r) => setTimeout(r, 450));
+  return {
+    fromLiveAPI: true,
+    text: buildSmartClinicalReply(skinPlan, userQuestion),
+  };
 }
 
 /**

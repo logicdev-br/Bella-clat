@@ -5,6 +5,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import BookingDrawer from './components/BookingDrawer';
 import BagDrawer from './components/BagDrawer';
+import BotanicalAIChatWidget from './components/BotanicalAIChatWidget';
 import HomeView from './views/HomeView';
 import RituaisView from './views/RituaisView';
 import DiagnosticView from './views/DiagnosticView';
@@ -35,6 +36,7 @@ function MainAppContent() {
       {/* Gavetas Laterais Globais */}
       <BookingDrawer />
       <BagDrawer />
+      <BotanicalAIChatWidget />
 
       {/* Notificação Flutuante Discreta de Luxo */}
       {toast && (
